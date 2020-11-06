@@ -1,29 +1,28 @@
+'use strict';
+
 const TestRunner = require('./TestRunner');
 
 const testRunner = new TestRunner();
 
-global.it = function(description, fn) {
-  try {
-    fn();
-    testRunner.passing++;
-    testRunner.testTreeNodes.push(`✓ ${description}`);
+const arr = [];
 
-  } catch (e) {
-    testRunner.failing++;
-    testRunner.testTreeNodes.push(`${testRunner.failing}) ${description}`);
-    testRunner.onError(testRunner.failing, description, e.toString());
-  }
+global.it = function(description, fn) {
+  testRunner.currentSuiteTests.push([description, fn]);
 };
 
-global.describe = function (description, fn) {
-  try {
-    testRunner.suites.push([description, fn]);
-  } catch (e) {
-    console.log('handle me');
-  }
+it.only = function (description, fn) {
+  if (!testRunner.onlyFlag) testRunner.onlyFlag = true;
+  testRunner.currentSuiteTests.push([description, fn, 'only']);
+}
+
+global.describe = function(description, fn) {
+  testRunner.suites.push([description, fn]);
+}
+
+global.beforeEach = function(fn) {
+  testRunner.currentSuiteBeforeHooks.push(fn);
 }
 
 require(process.argv[2]);
 
-testRunner.runSuites();
-testRunner.report();
+testRunner.execute();
