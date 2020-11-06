@@ -4,8 +4,6 @@ const TestRunner = require('./TestRunner');
 
 const testRunner = new TestRunner();
 
-const arr = [];
-
 global.it = function(description, fn) {
   testRunner.currentSuiteTests.push([description, fn]);
 };
