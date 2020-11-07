@@ -1,3 +1,5 @@
+const TABULATION = 2;
+
 class TestSummarizer {
     static drawResultTestTree(tree) {
         let spaces = 0;
@@ -12,7 +14,7 @@ class TestSummarizer {
                 continue;
             }
 
-            result += ' '.repeat(spaces + 2) + node + '\n';
+            result += ' '.repeat(spaces + TABULATION) + node + '\n';
         }
 
         console.log(result);

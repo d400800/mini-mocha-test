@@ -16,10 +16,10 @@ class TestRunner {
         this.onlyFlag = false;
     }
 
-    execute() {
-        this.runRootLevelTests();
+    async execute() {
+        await this.runRootLevelTests();
 
-        this.runSuites();
+        await this.runSuites();
 
         TestSummarizer.report(
             this.testTreeNodes, this.passing, this.failing, this.errorMessages
@@ -29,7 +29,7 @@ class TestRunner {
     beforeRunTests() {
         if (this.onlyFlag) {
             this.currentSuiteTests = this.currentSuiteTests
-                .filter(test => test[2] && test[2] === 'only')
+                .filter(([,, label]) => label && label === 'only')
         }
     }
 
@@ -39,21 +39,21 @@ class TestRunner {
         this.errorMessages.push(errorMessage);
     }
 
-    runRootLevelTests() {
+    async runRootLevelTests() {
         if (this.currentSuiteTests) {
-            this.runTests();
+            await this.runTests();
 
             this.currentSuiteTests = [];
         }
     }
 
-    runSuites() {
+    async runSuites() {
         for (let i = 0; i < this.suites.length; ++i) {
             const [description, fn] = this.suites[i];
 
-            fn();
+            await fn();
 
-            this.runTests(i, description);
+            await this.runTests(i, description);
 
             this.currentSuiteTests = [];
         }
@@ -71,7 +71,7 @@ class TestRunner {
         }
     }
 
-    runTests(suiteI, description) {
+    async runTests(suiteI, description) {
         this.beforeRunTests();
 
         this.addSuiteDescription(suiteI, description);
@@ -79,17 +79,17 @@ class TestRunner {
         if (this.currentSuiteTests.length) {
             for (const test of this.currentSuiteTests) {
                 for (const hook of this.currentSuiteBeforeHooks) {
-                    hook();
+                    await hook();
                 }
 
-                this.runTest(test);
+                await this.runTest(test);
             }
         }
     }
 
-    runTest([description, fn]) {
+    async runTest([description, fn]) {
         try {
-            fn();
+            await fn();
 
             this.passing++;
 
