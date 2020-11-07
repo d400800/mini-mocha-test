@@ -2,8 +2,6 @@
 
 const TestRunner = require('./TestRunner');
 
-const testRunner = new TestRunner();
-
 global.it = function(description, fn) {
   testRunner.currentSuiteTests.push([description, fn]);
 };
@@ -20,6 +18,10 @@ global.describe = function(description, fn) {
 global.beforeEach = function(fn) {
   testRunner.currentSuiteBeforeHooks.push(fn);
 }
+
+const commandLineArgs = process.argv[3] && process.argv[3];
+
+const testRunner = new TestRunner({commandLineArgs});
 
 require(process.argv[2]);
 

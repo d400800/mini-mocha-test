@@ -1,0 +1,5 @@
+  suite
+    sub-suite
+      ✓ description 0 (ms)
+
+  1 passing 1(ms)

@@ -1,6 +1,6 @@
 const TABULATION = 2;
 
-class TestSummarizer {
+class TestReporter {
     static drawResultTestTree(tree) {
         let spaces = 0;
         let result = '';
@@ -20,8 +20,10 @@ class TestSummarizer {
         console.log(result);
     }
 
-    static summarizeResults(passing, failing) {
-        console.log(`  ${passing} passing`);
+    static summarizeResults(passing, failing, time) {
+        const timeStr = time ? ` ${time}(ms)` : '';
+
+        console.log(`  ${passing} passing${timeStr}`);
 
         if (failing > 0) {
             console.log(`  ${failing} failing`);
@@ -34,13 +36,13 @@ class TestSummarizer {
         }
     }
 
-    static report(testTreeNodes, passing, failing, errorMessages) {
-        TestSummarizer.drawResultTestTree(testTreeNodes);
+    static report({testTreeNodes, passing, failing, errorMessages, time}) {
+        TestReporter.drawResultTestTree(testTreeNodes);
 
-        TestSummarizer.summarizeResults(passing, failing);
+        TestReporter.summarizeResults(passing, failing, time);
 
-        TestSummarizer.printErrorMessages(errorMessages);
+        TestReporter.printErrorMessages(errorMessages);
     }
 }
 
-module.exports = TestSummarizer;
+module.exports = TestReporter;

@@ -1,7 +1,8 @@
-const TestSummarizer = require('./TestSummarizer');
+const TestReporter = require('./TestReporter');
+const {promiseTimeout} = require('./utils');
 
 class TestRunner {
-    constructor() {
+    constructor({commandLineArgs}) {
         this.failing = 0;
         this.passing = 0;
 
@@ -14,16 +15,29 @@ class TestRunner {
         this.currentSuiteBeforeHooks = [];
 
         this.onlyFlag = false;
+
+        this.commandLineArgs = {
+            time: commandLineArgs === '--time',
+            timeout: commandLineArgs === '--timeout'
+        };
     }
 
     async execute() {
+        const testsStartTime = new Date().valueOf();
+
         await this.runRootLevelTests();
 
         await this.runSuites();
 
-        TestSummarizer.report(
-            this.testTreeNodes, this.passing, this.failing, this.errorMessages
-        );
+        TestReporter.report({
+            testTreeNodes: this.testTreeNodes,
+            passing: this.passing,
+            failing: this.failing,
+            errorMessages: this.errorMessages,
+            time: this.commandLineArgs.time
+                ? new Date().valueOf() - testsStartTime
+                : null
+        });
     }
 
     beforeRunTests() {
@@ -88,18 +102,33 @@ class TestRunner {
     }
 
     async runTest([description, fn]) {
+        let success;
+        const testStartTime = new Date().valueOf();
+
         try {
-            await fn();
+            if (this.commandLineArgs.timeout) {
+                await promiseTimeout(5000, fn());;
+            } else {
+                await fn();
+            }
 
             this.passing++;
 
-            this.testTreeNodes.push(`✓ ${description}`);
+            success = true;
         } catch (e) {
             this.failing++;
 
-            this.testTreeNodes.push(`${this.failing}) ${description}`);
+            success = false;
 
             this.onTestFail(this.failing, description, e.toString());
+        } finally {
+            const statusIndicator = success ? '✓' : `${this.failing})`;
+
+            const timeStr = this.commandLineArgs.time && success
+                ? ` ${new Date().valueOf() - testStartTime} (ms)`
+                : '';
+
+            this.testTreeNodes.push(`${statusIndicator} ${description}${timeStr}`);
         }
     }
 }
