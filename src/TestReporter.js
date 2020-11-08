@@ -1,4 +1,4 @@
-const TABULATION = 2;
+const {TABULATION} = require('./utils');
 
 class TestReporter {
     static drawResultTestTree(tree) {

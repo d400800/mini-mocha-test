@@ -12,6 +12,12 @@ const promiseTimeout = async function(ms, promise){
     ])
 }
 
+const TABULATION = 2;
+
+const TIMEOUT = 5000;
+
 module.exports = {
-    promiseTimeout
+    promiseTimeout,
+    TABULATION,
+    TIMEOUT
 }

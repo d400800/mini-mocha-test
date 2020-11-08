@@ -38,5 +38,5 @@ readdirSync(fixture(''))
   .map(_ => {
     return _.slice(0, -1 * specSuffix.length);
   })
-  .slice(13,14)
+    .slice(10,11)
   .forEach(_ => testFixture(_));

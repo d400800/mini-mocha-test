@@ -1,5 +1,5 @@
 const TestReporter = require('./TestReporter');
-const {promiseTimeout} = require('./utils');
+const {promiseTimeout, TABULATION, TIMEOUT} = require('./utils');
 
 class TestRunner {
     constructor({commandLineArgs}) {
@@ -16,6 +16,7 @@ class TestRunner {
 
         this.onlyFlag = false;
 
+        // in a real app, a command line args parser would be used for this
         this.commandLineArgs = {
             time: commandLineArgs === '--time',
             timeout: commandLineArgs === '--timeout'
@@ -73,14 +74,18 @@ class TestRunner {
         }
     }
 
+    generateSuiteDescription(suiteI, description) {
+        this.testTreeNodes.push(' '.repeat((suiteI+1)*TABULATION) + description);
+    }
+
     addSuiteDescription(suiteI, description) {
         if (this.onlyFlag) {
             if (description && this.currentSuiteTests.length) {
-                this.testTreeNodes.push(' '.repeat((suiteI+1)*2) + description);
+                this.generateSuiteDescription(suiteI, description);
             }
         } else {
             if (description) {
-                this.testTreeNodes.push(' '.repeat((suiteI+1)*2) + description);
+                this.generateSuiteDescription(suiteI, description);
             }
         }
     }
@@ -107,7 +112,7 @@ class TestRunner {
 
         try {
             if (this.commandLineArgs.timeout) {
-                await promiseTimeout(5000, fn());;
+                await promiseTimeout(TIMEOUT, fn());;
             } else {
                 await fn();
             }

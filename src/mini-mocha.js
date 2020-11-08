@@ -8,6 +8,7 @@ global.it = function(description, fn) {
 
 it.only = function (description, fn) {
   if (!testRunner.onlyFlag) testRunner.onlyFlag = true;
+
   testRunner.currentSuiteTests.push([description, fn, 'only']);
 }
 
